@@ -1,3 +1,6 @@
+// Jaren Kawai
+// jkawai@ucsc.edu
+
 class Octagon {
     constructor() {
         this.type = 'octagon';
