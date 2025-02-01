@@ -105,19 +105,10 @@ let g_bodyAngle = 0;
 let g_tailAngle = 0;
 let g_animalMatrix = new Matrix4();
 let g_animalSpin = 0;
+let g_cameraAngle = 0;
+let g_sliderAngle = 0;
 
 g_animalMatrix.translate(-.1,-.2,0);
-// Rainbow mode array
-const rainbowColors = [
-  [1.0, 0.0, 0.0, 1.0], // Red
-  [1.0, 0.5, 0.0, 1.0], // Orange
-  [1.0, 1.0, 0.0, 1.0], // Yellow
-  [0.0, 1.0, 0.0, 1.0], // Green
-  [0.0, 0.0, 1.0, 1.0], // Blue
-  [0.29, 0.0, 0.51, 1.0], // Indigo
-  [0.93, 0.51, 0.93, 1.0] // Violet
-];
-
 
 function addActionsFromUI(){
 
@@ -129,9 +120,9 @@ function addActionsFromUI(){
   document.getElementById('magentaOFF').onclick = function() { g_extraAnimation = false; };
 
   //Slider information
-  //document.getElementById('angleSlide').addEventListener('mousemove', function() { g_globalAngle = this.value; renderAllShapes(); });
+  document.getElementById('angleSlide').addEventListener('mousemove', function() { g_cameraAngle = this.value, renderAllShapes()});
   document.getElementById('yellowSlide').addEventListener('mousemove', function() { g_yellowAngle = this.value; renderAllShapes(); });
-  //document.getElementById('magentaSlide').addEventListener('mousemove', function() { g_magentaAngle = this.value; renderAllShapes(); });
+  document.getElementById('magentaSlide').addEventListener('mousemove', function() { g_sliderAngle = this.value; renderAllShapes(); });
 
 }
 
@@ -170,6 +161,7 @@ function main() {
   
         g_globalAngleX += deltaX * 0.5; // Adjust sensitivity
         g_globalAngleY += deltaY * 0.5;
+
         renderAllShapes();
   
         g_mouseX = ev.clientX;
@@ -226,8 +218,9 @@ function convertCoordinatesEventToGL(ev){
 function renderAllShapes(){
 
   var startTime = performance.now();
+  var totalRotationX = -g_globalAngleX + parseFloat(-g_cameraAngle);
 
-  var globalRotMat = new Matrix4().rotate(-g_globalAngleX, 0, 1, 0).rotate(-g_globalAngleY, 1, 0, 0);
+  var globalRotMat = new Matrix4().rotate(totalRotationX, 0, 1, 0).rotate(-g_globalAngleY, 1, 0, 0);
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements);
 
 
@@ -273,7 +266,7 @@ function renderAllShapes(){
   var stripe2 = new Cube();
   stripe2.color = [0.0, 0.0, 0.0, 1.0];
   stripe2.matrix.rotate(-5,1,0,0);
-  stripe2.matrix = bodyMatrix;//fixing
+  stripe2.matrix = bodyMatrix;
   stripe2.matrix.translate(0, 4, 0);
   stripe2.render();
 
@@ -343,6 +336,7 @@ function renderAllShapes(){
   rightwrist.color = [1.0, .7, 0.0, 1.0];
   rightwrist.matrix.rotate(-5,1,0,0);
   rightwrist.matrix.rotate( 2*g_yellowAngle, 0, 0, 1);
+  rightwrist.matrix.rotate( g_sliderAngle, 1, 0, 1);
   rightwrist.matrix.scale(0.2, .2, .3);
   rightwrist.matrix.translate(-3.7,.2,-.1);
   rightwrist.matrix.rotate(-5,0,1,-10);
